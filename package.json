@@ -1,0 +1,51 @@
+{
+  "name": "todo-list",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "homepage": "./",
+  "dependencies": {
+    "cra-template": "1.2.0",
+    "electron-is-dev": "^3.0.1",
+    "electron-store": "^8.1.0",
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^4.2.4"
+  },
+"scripts": {
+  "start": "react-scripts start",
+  "electron": "SET ELECTRON_START_URL=http://localhost:3000 && electron .",
+  "dev": "concurrently -k \"cross-env BROWSER=none npm start\" \"npm:electron\"",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.0.0",
+    "vite": "^5.0.0",
+    "wait-on": "^8.0.1"
+  }
+}
