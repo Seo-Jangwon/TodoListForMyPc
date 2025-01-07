@@ -14,14 +14,14 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^4.2.4"
   },
-"scripts": {
-  "start": "react-scripts start",
-  "electron": "SET ELECTRON_START_URL=http://localhost:3000 && electron .",
-  "dev": "concurrently -k \"cross-env BROWSER=none npm start\" \"npm:electron\"",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-},
+  "scripts": {
+    "start": "react-scripts start",
+    "electron": "SET ELECTRON_START_URL=http://localhost:3000 && electron .",
+    "dev": "concurrently -k \"cross-env BROWSER=none npm start\" \"npm:electron\"",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -45,6 +45,7 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^28.0.0",
+    "electron-builder": "^25.1.8",
     "vite": "^5.0.0",
     "wait-on": "^8.0.1"
   }

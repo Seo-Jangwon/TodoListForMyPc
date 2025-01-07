@@ -20,8 +20,24 @@ function createWindow() {
   // React 앱 로드
   mainWindow.loadURL('http://localhost:3000')
 
-  // 개발자 도구
-  mainWindow.webContents.openDevTools()
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    setTimeout(() => {
+      mainWindow.webContents.send('check-due-dates');
+    }, 1000);
+  });
+}
+
+// 알림 처리
+ipcMain.on('show-notification', (event, { title, body }) => {
+  if (Notification.isSupported()) {
+    new Notification({
+      title,
+      body,
+      icon: path.join(__dirname, 'icon.png') // 아이콘이 있는 경우
+    }).show();
+  }
+});
 
   // 로드 실패 시 재시도
   mainWindow.webContents.on('did-fail-load', () => {
