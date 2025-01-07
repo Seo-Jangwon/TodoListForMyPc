@@ -1,18 +1,46 @@
 import React, { useState } from "react";
 import { PRIORITY } from "../constants/priority";
-import { Edit, Save, X, Calendar } from "lucide-react";
+import {
+  Box,
+  Paper,
+  TextField,
+  IconButton,
+  Checkbox,
+  Typography,
+  Menu,
+  MenuItem,
+  FormControl,
+  Select,
+} from "@mui/material";
+import {
+  MoreVert as MoreVertIcon,
+  CalendarToday as CalendarIcon,
+} from "@mui/icons-material";
 
-const TodoItem = ({
-  todo,
-  onToggle,
-  onDelete,
-  onPriorityChange,
-  onEdit,
-  showPrioritySelect = true,
-}) => {
+const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
   const [editDueDate, setEditDueDate] = useState(todo.dueDate || "");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    handleClose();
+  };
+
+  const handleDelete = () => {
+    onDelete(todo.id);
+    handleClose();
+  };
 
   const handleSave = () => {
     if (editText.trim()) {
@@ -31,158 +59,167 @@ const TodoItem = ({
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // 날짜가 지났는지 확인
     const isOverdue = today > dueDate;
-
-    // 시간을 제외한 날짜만 비교
     const isToday = today.toDateString() === dueDate.toDateString();
     const isTomorrow = tomorrow.toDateString() === dueDate.toDateString();
 
-    const dateStyle = {
-      fontSize: "12px",
-      padding: "2px 8px",
-      borderRadius: "4px",
-      backgroundColor: isOverdue ? "#fee2e2" : isToday ? "#e0f2fe" : "#f3f4f6",
-      color: isOverdue ? "#dc2626" : isToday ? "#0369a1" : "#4b5563",
-    };
-
     return (
-      <span style={dateStyle}>
-        <Calendar size={12} style={{ marginRight: "4px", display: "inline" }} />
+      <Typography
+        variant="caption"
+        sx={{
+          px: 1,
+          py: 0.5,
+          borderRadius: 1,
+          bgcolor: isOverdue
+            ? "error.lightest"
+            : isToday
+            ? "info.lightest"
+            : "grey.100",
+          color: isOverdue
+            ? "error.main"
+            : isToday
+            ? "info.main"
+            : "text.secondary",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 0.5,
+          mt: 0.5,
+        }}
+      >
+        <CalendarIcon fontSize="inherit" />
         {isToday
           ? "오늘"
           : isTomorrow
           ? "내일"
           : new Date(date).toLocaleDateString("ko-KR")}
-      </span>
+      </Typography>
     );
   };
 
   return (
-    <div
-      style={{
+    <Paper
+      elevation={1}
+      sx={{
+        p: 2,
         display: "flex",
-        alignItems: "center",
-        padding: "12px",
-        marginBottom: "8px",
-        backgroundColor: "white",
-        borderRadius: "6px",
-        borderLeft: `4px solid ${PRIORITY[todo.priority]?.color || "#d1d5db"}`,
-        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+        alignItems: "flex-start",
+        gap: 1,
+        borderLeft: 4,
+        borderColor: PRIORITY[todo.priority]?.color,
       }}
     >
-      <input
-        type="checkbox"
-        checked={todo.completed}
-        onChange={onToggle}
-        style={{ marginRight: "12px" }}
-      />
-      <div style={{ flex: 1 }}>
+      <Checkbox checked={todo.completed} onChange={() => onToggle(todo.id)} />
+      <Box sx={{ flex: 1 }}>
         {isEditing ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <input
-              type="text"
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <TextField
+              fullWidth
+              size="small"
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              style={{
-                padding: "4px 8px",
-                border: "1px solid #e2e8f0",
-                borderRadius: "4px",
+              autoFocus
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSave();
+                }
               }}
             />
-            <input
+            <TextField
               type="datetime-local"
+              size="small"
               value={editDueDate}
               onChange={(e) => setEditDueDate(e.target.value)}
-              style={{
-                padding: "4px 8px",
-                border: "1px solid #e2e8f0",
-                borderRadius: "4px",
-              }}
             />
-          </div>
+            <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+              <FormControl size="small" sx={{ minWidth: 100 }}>
+                <Select
+                  size="small"
+                  value={todo.priority}
+                  onChange={(e) =>
+                    onEdit(todo.id, {
+                      ...todo,
+                      priority: e.target.value,
+                    })
+                  }
+                >
+                  {Object.values(PRIORITY).map((priority) => (
+                    <MenuItem
+                      key={priority.value}
+                      value={priority.value}
+                      sx={{ color: priority.color }}
+                    >
+                      {priority.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <button
+                onClick={handleSave}
+                style={{
+                  padding: "6px 12px",
+                  background: "#3b82f6",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                저장
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                style={{
+                  padding: "6px 12px",
+                  background: "#gray",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                취소
+              </button>
+            </Box>
+          </Box>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <span
-              style={{
-                textDecoration: todo.completed ? "line-through" : "none",
-                color: todo.completed ? "#9ca3af" : "#1f2937",
-              }}
-            >
-              {todo.text}
-            </span>
+          <Box>
+            <Typography>{todo.text}</Typography>
             {todo.dueDate && formatDueDate(todo.dueDate)}
-            {todo.completedAt && (
-              <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                완료: {new Date(todo.completedAt).toLocaleString("ko-KR")}
-              </div>
-            )}
-          </div>
+          </Box>
         )}
-      </div>
-      {showPrioritySelect && (
+      </Box>
+      {!todo.completed && !isEditing && (
         <>
-          {isEditing ? (
-            <button
-              onClick={handleSave}
-              style={{
-                marginLeft: "8px",
-                padding: "4px 8px",
-                border: "none",
-                background: "none",
-                color: "#3b82f6",
-                cursor: "pointer",
-              }}
-            >
-              <Save size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              style={{
-                marginLeft: "8px",
-                padding: "4px 8px",
-                border: "none",
-                background: "none",
-                color: "#6b7280",
-                cursor: "pointer",
-              }}
-            >
-              <Edit size={16} />
-            </button>
-          )}
-          <select
-            value={todo.priority}
-            onChange={(e) => onPriorityChange(e.target.value)}
-            style={{
-              marginLeft: "8px",
-              padding: "2px",
-              border: "1px solid #e2e8f0",
-              borderRadius: "4px",
+          <IconButton
+            size="small"
+            onClick={handleClick}
+            aria-controls={open ? "todo-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            id="todo-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
             }}
           >
-            {Object.values(PRIORITY).map((priority) => (
-              <option key={priority.value} value={priority.value}>
-                {priority.label}
-              </option>
-            ))}
-          </select>
+            <MenuItem onClick={handleEdit}>수정</MenuItem>
+            <MenuItem onClick={handleDelete} sx={{ color: "error.main" }}>
+              삭제
+            </MenuItem>
+          </Menu>
         </>
       )}
-      <button
-        onClick={onDelete}
-        style={{
-          marginLeft: "8px",
-          padding: "4px 8px",
-          border: "none",
-          background: "none",
-          color: "#9ca3af",
-          cursor: "pointer",
-        }}
-      >
-        <X size={16} />
-      </button>
-    </div>
+    </Paper>
   );
 };
 

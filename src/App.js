@@ -1,10 +1,45 @@
 import React, { useState, useEffect } from "react";
-import TodoInput from "./components/TodoInput";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import TodoItem from "./components/TodoItem";
-import TodoTabs from "./components/TodoTabs";
-import { styles } from "./styles/common";
-import { PRIORITY } from "./constants/priority";
-const { ipcRenderer } = window.require("electron");
+import {
+  Box,
+  Paper,
+  TextField,
+  IconButton,
+  Select,
+  MenuItem,
+  Checkbox,
+  Typography,
+  FormControl,
+  Tabs,
+  Tab,
+} from "@mui/material";
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Save as SaveIcon,
+  CalendarToday as CalendarIcon,
+} from "@mui/icons-material";
+
+const theme = createTheme({
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          backdropFilter: "blur(10px)",
+        },
+      },
+    },
+  },
+});
+
+const PRIORITY = {
+  HIGH: { value: "HIGH", label: "높음", color: "#ef4444" },
+  MEDIUM: { value: "MEDIUM", label: "보통", color: "#10b981" },
+  LOW: { value: "LOW", label: "낮음", color: "#6b7280" },
+};
 
 const App = () => {
   const [todos, setTodos] = useState(() => {
@@ -15,7 +50,7 @@ const App = () => {
   const [selectedPriority, setSelectedPriority] = useState(
     PRIORITY.MEDIUM.value
   );
-  const [activeTab, setActiveTab] = useState("active");
+  const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
@@ -30,7 +65,6 @@ const App = () => {
         completed: false,
         priority: selectedPriority,
         createdAt: new Date().toISOString(),
-        completedAt: null,
         dueDate: null,
       };
       setTodos((prev) => [...prev, newTodoItem]);
@@ -38,133 +72,131 @@ const App = () => {
     }
   };
 
-  const editTodo = (id, updates) => {
-    setTodos((prev) =>
-      prev.map((todo) => (todo.id === id ? { ...todo, ...updates } : todo))
-    );
-  };
-
-  const toggleTodo = (id) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              completed: !todo.completed,
-              completedAt: !todo.completed ? new Date().toISOString() : null,
-            }
-          : todo
-      )
-    );
-  };
-
-  // 마감일 체크 및 알림
-  const checkDueDates = () => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const upcomingTodos = todos.filter((todo) => {
-      if (!todo.dueDate || todo.completed) return false;
-
-      const dueDate = new Date(todo.dueDate);
-      const timeDiff = dueDate - today;
-      const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-      return daysDiff <= 1 && daysDiff >= 0;
-    });
-
-    // 알림이 필요한 할 일이 있으면 main 프로세스에 알림 요청
-    upcomingTodos.forEach((todo) => {
-      const dueDate = new Date(todo.dueDate);
-      const isToday = dueDate.toDateString() === today.toDateString();
-
-      ipcRenderer.send("show-notification", {
-        title: isToday
-          ? "오늘 마감 예정인 할 일이 있습니다!"
-          : "내일 마감 예정인 할 일이 있습니다!",
-        body: `${todo.text} - ${isToday ? "오늘" : "내일"} 마감`,
-      });
-    });
-  };
-
-  useEffect(() => {
-    ipcRenderer.on("check-due-dates", checkDueDates);
-    return () => {
-      ipcRenderer.removeListener("check-due-dates", checkDueDates);
-    };
-  }, [todos]);
-
   const activeTodos = todos.filter((todo) => !todo.completed);
   const completedTodos = todos.filter((todo) => todo.completed);
 
-  const sortedTodos = [
-    ...(activeTab === "active" ? activeTodos : completedTodos),
-  ].sort((a, b) => {
-    if (activeTab === "completed") {
-      // 완료된 항목은 최근에 완료된 순으로 정렬
-      return new Date(b.completedAt) - new Date(a.completedAt);
-    }
-    // 진행중인 항목은 우선순위 순으로 정렬
-    const priorityOrder = { HIGH: 2, MEDIUM: 1, LOW: 0 };
-    return priorityOrder[b.priority] - priorityOrder[a.priority];
-  });
-
   return (
-    <div style={styles.container}>
-      <div style={styles.dragBar}>할 일 목록</div>
+    <ThemeProvider theme={theme}>
+      <Paper
+        elevation={3}
+        sx={{
+          width: "100%",
+          height: "100vh",
+          borderRadius: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            p: 2,
+            WebkitAppRegion: "drag",
+            bgcolor: "background.paper",
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Typography variant="h6">할 일 목록</Typography>
+        </Box>
 
-      <div style={styles.content}>
-        {activeTab === "active" && (
-          <TodoInput
-            newTodo={newTodo}
-            setNewTodo={setNewTodo}
-            selectedPriority={selectedPriority}
-            setSelectedPriority={setSelectedPriority}
-            addTodo={addTodo}
-          />
-        )}
-
-        <TodoTabs
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          activeTodosCount={activeTodos.length}
-          completedTodosCount={completedTodos.length}
-        />
-
-        <div>
-          {sortedTodos.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              onToggle={() => toggleTodo(todo.id)}
-              onDelete={() => {
-                setTodos((prev) => prev.filter((t) => t.id !== todo.id));
-              }}
-              onPriorityChange={(newPriority) => {
-                setTodos((prev) =>
-                  prev.map((t) =>
-                    t.id === todo.id ? { ...t, priority: newPriority } : t
-                  )
-                );
-              }}
-              onEdit={editTodo} // 추가
-              showPrioritySelect={activeTab === "active"}
-            />
-          ))}
-        </div>
-
-        {sortedTodos.length === 0 && (
-          <div
-            style={{ textAlign: "center", color: "#6b7280", marginTop: "24px" }}
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            WebkitAppRegion: "no-drag",
+          }}
+        >
+          <Tabs
+            value={activeTab}
+            onChange={(e, newValue) => setActiveTab(newValue)}
           >
-            {activeTab === "active"
-              ? "추가된 할 일이 없습니다."
-              : "완료된 할 일이 없습니다."}
-          </div>
-        )}
-      </div>
-    </div>
+            <Tab label={`진행중 (${activeTodos.length})`} />
+            <Tab label={`완료됨 (${completedTodos.length})`} />
+          </Tabs>
+        </Box>
+
+        <Box sx={{ p: 2, flex: 1, overflowY: "auto" }}>
+          {activeTab === 0 && (
+            <form onSubmit={addTodo}>
+              <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+                <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value={newTodo}
+                    onChange={(e) => setNewTodo(e.target.value)}
+                    placeholder="새로운 할 일을 입력하세요"
+                  />
+                  <IconButton type="submit" color="primary">
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Typography color="textSecondary">우선순위 선택</Typography>
+                  <FormControl size="small" sx={{ flex: 1 }}>
+                    <Select
+                      value={selectedPriority}
+                      onChange={(e) => setSelectedPriority(e.target.value)}
+                    >
+                      {Object.values(PRIORITY).map((priority) => (
+                        <MenuItem
+                          key={priority.value}
+                          value={priority.value}
+                          sx={{ color: priority.color }}
+                        >
+                          {priority.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Paper>
+            </form>
+          )}
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {(activeTab === 0 ? activeTodos : completedTodos)
+              .sort((a, b) => {
+                if (activeTab === 0) {
+                  const priorityOrder = { HIGH: 2, MEDIUM: 1, LOW: 0 };
+                  return priorityOrder[b.priority] - priorityOrder[a.priority];
+                }
+                return new Date(b.completedAt) - new Date(a.completedAt);
+              })
+              .map((todo) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  onToggle={(id) => {
+                    setTodos((prev) =>
+                      prev.map((t) =>
+                        t.id === id
+                          ? {
+                              ...t,
+                              completed: !t.completed,
+                              completedAt: !t.completed
+                                ? new Date().toISOString()
+                                : null,
+                            }
+                          : t
+                      )
+                    );
+                  }}
+                  onDelete={(id) => {
+                    setTodos((prev) => prev.filter((t) => t.id !== id));
+                  }}
+                  onEdit={(id, updates) => {
+                    setTodos((prev) =>
+                      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+                    );
+                  }}
+                />
+              ))}
+          </Box>
+        </Box>
+      </Paper>
+    </ThemeProvider>
   );
 };
 
