@@ -1,39 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import TodoItem from "./components/TodoItem";
+import { styles } from "./styles/common";
 import {
-  Box,
-  Paper,
-  TextField,
-  IconButton,
+  Button,
+  ConfigProvider,
+  DatePicker,
+  Flex,
+  Input,
   Select,
-  MenuItem,
-  Checkbox,
-  Typography,
-  FormControl,
-  Tabs,
-  Tab,
-} from "@mui/material";
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  Save as SaveIcon,
-  CalendarToday as CalendarIcon,
-} from "@mui/icons-material";
-
-const theme = createTheme({
-  components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
-          backdropFilter: "blur(10px)",
-        },
-      },
-    },
-  },
-});
+  Space,
+} from "antd";
+import { PlusSquare } from "lucide-react";
+import PriorityCircle from "./components/PriorityCircle";
 
 const PRIORITY = {
   HIGH: { value: "HIGH", label: "높음", color: "#ef4444" },
@@ -75,128 +52,137 @@ const App = () => {
   const activeTodos = todos.filter((todo) => !todo.completed);
   const completedTodos = todos.filter((todo) => todo.completed);
 
+  // 할 일 추가 모달
+  const [isAddTodoModalOpen, setIsAddTodoModalOpen] = useState(false);
+
+  const showAddTodoModal = () => {
+    setIsAddTodoModalOpen(true);
+  };
+
+  const hideAddTodoModal = () => {
+    setIsAddTodoModalOpen(false);
+  };
+
+  // 우선순위 목록
+  const priorityItems = {
+    items: [
+      {
+        value: PRIORITY.HIGH.value,
+        label: <PriorityCircle priority="priority-high-background" />,
+        onClick: () => setSelectedPriority(PRIORITY.HIGH.value),
+      },
+      {
+        value: PRIORITY.MEDIUM.value,
+        label: <PriorityCircle priority="priority-medium-background" />,
+        onClick: () => setSelectedPriority(PRIORITY.MEDIUM.value),
+      },
+      {
+        value: PRIORITY.LOW.value,
+        label: <PriorityCircle priority="priority-low-background" />,
+        onClick: () => setSelectedPriority(PRIORITY.LOW.value),
+      },
+    ],
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <Paper
-        elevation={3}
-        sx={{
-          width: "100%",
-          height: "100vh",
-          borderRadius: 0,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          sx={{
-            p: 2,
-            WebkitAppRegion: "drag",
-            bgcolor: "background.paper",
-            borderBottom: 1,
-            borderColor: "divider",
-          }}
-        >
-          <Typography variant="h6">할 일 목록</Typography>
-        </Box>
+    <ConfigProvider
+      theme={{
+        token: {
+          fontFamily: "Pretendard",
+        },
+      }}>
+      <Flex gap="middle" vertical style={styles.container}>
+        {/* 헤더 */}
+        <Flex className="header accent" justify="space-between" align="center">
+          <h1 style={{ fontSize: "1rem" }}>TODO</h1>
+          <PlusSquare
+            size={20}
+            strokeWidth={2}
+            stroke="#242424"
+            fill="#FFB2F9"
+          />
+        </Flex>
 
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            WebkitAppRegion: "no-drag",
-          }}
-        >
-          <Tabs
-            value={activeTab}
-            onChange={(e, newValue) => setActiveTab(newValue)}
-          >
-            <Tab label={`진행중 (${activeTodos.length})`} />
-            <Tab label={`완료됨 (${completedTodos.length})`} />
-          </Tabs>
-        </Box>
+        {/* 새로운 할 일 입력란 */}
+        <Space
+          className="rounded input-box-background"
+          direction="vertical"
+          style={{
+            display: "flex",
+            gap: 5,
+            padding: "0.65rem 0.5rem",
+          }}>
+          <Space.Compact block>
+            {/* 우선순위 드롭다운 */}
+            <Select
+              defaultValue={PRIORITY.MEDIUM.value}
+              onChange={(value) => setSelectedPriority(value)}
+              options={[
+                {
+                  value: PRIORITY.HIGH.value,
+                  label: (
+                    <PriorityCircle
+                      priority={PRIORITY.HIGH.value.toLowerCase()}
+                    />
+                  ),
+                },
+                {
+                  value: PRIORITY.MEDIUM.value,
+                  label: (
+                    <PriorityCircle
+                      priority={PRIORITY.MEDIUM.value.toLowerCase()}
+                    />
+                  ),
+                },
+                {
+                  value: PRIORITY.LOW.value,
+                  label: (
+                    <PriorityCircle
+                      priority={PRIORITY.LOW.value.toLowerCase()}
+                    />
+                  ),
+                },
+              ]}
+            />
+            {/* 내용 */}
+            <Input
+              placeholder="새로운 할 일"
+              style={{
+                fontWeight: 500,
+              }}
+            />
+          </Space.Compact>
 
-        <Box sx={{ p: 2, flex: 1, overflowY: "auto" }}>
-          {activeTab === 0 && (
-            <form onSubmit={addTodo}>
-              <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
-                <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
-                    placeholder="새로운 할 일을 입력하세요"
-                  />
-                  <IconButton type="submit" color="primary">
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Typography color="textSecondary">우선순위 선택</Typography>
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <Select
-                      value={selectedPriority}
-                      onChange={(e) => setSelectedPriority(e.target.value)}
-                    >
-                      {Object.values(PRIORITY).map((priority) => (
-                        <MenuItem
-                          key={priority.value}
-                          value={priority.value}
-                          sx={{ color: priority.color }}
-                        >
-                          {priority.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Paper>
-            </form>
-          )}
+          {/* 날짜 */}
+          <DatePicker.RangePicker
+            placeholder={["시작", "종료"]}
+            allowEmpty={[false, false]}
+          />
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {(activeTab === 0 ? activeTodos : completedTodos)
-              .sort((a, b) => {
-                if (activeTab === 0) {
-                  const priorityOrder = { HIGH: 2, MEDIUM: 1, LOW: 0 };
-                  return priorityOrder[b.priority] - priorityOrder[a.priority];
-                }
-                return new Date(b.completedAt) - new Date(a.completedAt);
-              })
-              .map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  onToggle={(id) => {
-                    setTodos((prev) =>
-                      prev.map((t) =>
-                        t.id === id
-                          ? {
-                              ...t,
-                              completed: !t.completed,
-                              completedAt: !t.completed
-                                ? new Date().toISOString()
-                                : null,
-                            }
-                          : t
-                      )
-                    );
-                  }}
-                  onDelete={(id) => {
-                    setTodos((prev) => prev.filter((t) => t.id !== id));
-                  }}
-                  onEdit={(id, updates) => {
-                    setTodos((prev) =>
-                      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
-                    );
-                  }}
-                />
-              ))}
-          </Box>
-        </Box>
-      </Paper>
-    </ThemeProvider>
+          {/* 버튼 */}
+          <Space
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 5,
+              paddingTop: "0.4rem",
+            }}>
+            <Button
+              size="small"
+              style={{
+                ...styles.button,
+                background: "var(--color-tabSelected)",
+                fontWeight: 500,
+              }}>
+              저장
+            </Button>
+            <Button type="text" size="small" style={{ ...styles.button }}>
+              취소
+            </Button>
+          </Space>
+        </Space>
+      </Flex>
+    </ConfigProvider>
   );
 };
 

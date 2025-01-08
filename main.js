@@ -1,5 +1,28 @@
 const { app, BrowserWindow, ipcMain, Notification } = require("electron");
 const path = require("path");
+const fs = require("fs");
+const { defaultColorScheme } = require("./src/constants/defaultColorScheme");
+
+const userDataPath = app.getPath("userData");
+const colorSchemePath = path.join(userDataPath, "colors.json");
+
+// 색상 스키마 저장
+ipcMain.on("save-color-scheme", (event, colorScheme) => {
+  fs.writeFileSync(colorSchemePath, JSON.stringify({ theme: colorScheme }));
+});
+
+// 색상 스키마 불러오기
+function loadColorScheme() {
+  try {
+    const userColorScheme = JSON.parse(
+      fs.readFileSync(colorSchemePath, "utf8")
+    );
+
+    return { theme: { ...defaultColorScheme.theme, ...userColorScheme.theme } };
+  } catch (error) {
+    return { theme: { ...defaultColorScheme.theme } };
+  }
+}
 
 let mainWindow;
 
@@ -8,8 +31,6 @@ function createWindow() {
     width: 320,
     height: 450,
     frame: false,
-    transparent: true,
-    backgroundColor: "#00ffffff", // 투명도 지원을 위해 추가
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -30,6 +51,18 @@ function createWindow() {
   mainWindow.webContents.on("did-fail-load", () => {
     console.log("Failed to load application, retrying...");
     setTimeout(() => mainWindow.reload(), 1000);
+  });
+
+  // 색상 스키마 적용
+  mainWindow.webContents.on("dom-ready", () => {
+    const colors = loadColorScheme().theme;
+    const cssVars = Object.entries(colors)
+      .map(([key, value]) => `--color-${key}: ${value};`)
+      .join(";");
+
+    mainWindow.webContents.executeJavaScript(
+      `document.documentElement.style.cssText = \`${cssVars}\`;`
+    );
   });
 
   // 콘텐츠가 준비되면 창 표시
