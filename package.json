@@ -5,17 +5,17 @@
   "main": "main.js",
   "homepage": "./",
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.3.1",
-    "@mui/material": "^6.3.1",
+    "@ant-design/icons": "^5.5.2",
+    "antd": "^5.23.0",
     "cra-template": "1.2.0",
+    "dayjs": "^1.11.13",
     "electron-is-dev": "^3.0.1",
     "electron-store": "^8.1.0",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
+    "styled-components": "^6.1.14",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
