@@ -1,9 +1,9 @@
 import React from "react";
-import { List, Checkbox, Button, Typography, Dropdown, Space } from "antd";
-import { MoreOutlined, CalendarOutlined } from "@ant-design/icons";
+import {List, Checkbox, Button, Typography, Dropdown, Space} from "antd";
+import {MoreOutlined, CalendarOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 
-const { Text } = Typography;
+const {Text} = Typography;
 
 const PRIORITY_COLORS = {
   HIGH: "#f5222d",
@@ -17,7 +17,7 @@ const PRIORITY_LABELS = {
   LOW: "낮음",
 };
 
-const TodoItem = ({ todo, onToggle, onEdit, onDelete }) => {
+const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
   const menuItems = {
     items: [
       {
@@ -35,51 +35,57 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete }) => {
   };
 
   return (
-    <List.Item
-      style={{
-        backgroundColor: todo.completed ? "#f5f5f5" : "white",
-        borderLeft: `3px solid ${PRIORITY_COLORS[todo.priority]}`,
-        marginBottom: 8,
-        padding: 12,
-        borderRadius: 4,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-        <Checkbox checked={todo.completed} onChange={() => onToggle(todo.id)} />
-        <Space
-          direction="vertical"
-          size={0}
-          style={{ flex: 1, marginLeft: 12 }}
-        >
-          <Text
-            style={{
-              textDecoration: todo.completed ? "line-through" : "none",
-              color: todo.completed ? "#999" : "inherit",
-            }}
+      <List.Item
+          style={{
+            backgroundColor: todo.completed ? "#f5f5f5" : "white",
+            borderLeft: `3px solid ${PRIORITY_COLORS[todo.priority]}`,
+            marginBottom: 8,
+            padding: 12,
+            borderRadius: 4,
+          }}
+      >
+        <div style={{display: "flex", alignItems: "center", width: "100%"}}>
+          <Checkbox checked={todo.completed}
+                    onChange={() => onToggle(todo.id)}/>
+          <Space
+              direction="vertical"
+              size={0}
+              style={{flex: 1, marginLeft: 12}}
           >
-            {todo.text}
-          </Text>
-          <Space size={8}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {PRIORITY_LABELS[todo.priority]}
+            <Text
+                style={{
+                  textDecoration: todo.completed ? "line-through" : "none",
+                  color: todo.completed ? "#999" : "inherit",
+                }}
+            >
+              {todo.text}
             </Text>
-            {todo.dueDate && (
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                <CalendarOutlined style={{ marginRight: 4 }} />
-                {dayjs(todo.dueDate).format("YYYY-MM-DD HH:mm")}
+            <Space size={8}>
+              <Text type="secondary" style={{fontSize: 12}}>
+                우선순위: {PRIORITY_LABELS[todo.priority]}
               </Text>
-            )}
+              {(todo.startDate || todo.endDate) && (
+                  <Text type="secondary" style={{fontSize: 12}}>
+                    <CalendarOutlined style={{marginRight: 4}}/>
+                    {todo.startDate && dayjs(todo.startDate).format(
+                        'YYYY-MM-DD HH:mm')}
+                    {todo.startDate && todo.endDate && ' ~ '}
+                    {todo.endDate && dayjs(todo.endDate).format(
+                        'YYYY-MM-DD HH:mm')}
+                  </Text>
+              )}
+            </Space>
           </Space>
-        </Space>
-        <Dropdown menu={menuItems} placement="bottomRight" trigger={["click"]}>
-          <Button
-            type="text"
-            icon={<MoreOutlined />}
-            style={{ marginLeft: 8 }}
-          />
-        </Dropdown>
-      </div>
-    </List.Item>
+          <Dropdown menu={menuItems} placement="bottomRight"
+                    trigger={["click"]}>
+            <Button
+                type="text"
+                icon={<MoreOutlined/>}
+                style={{marginLeft: 8}}
+            />
+          </Dropdown>
+        </div>
+      </List.Item>
   );
 };
 

@@ -1,85 +1,79 @@
 import React from "react";
-import { List, Typography, Divider } from "antd";
+import {List, Typography} from "antd";
 import TodoItem from "./TodoItem";
 import dayjs from "dayjs";
 
-const { Title, Text } = Typography;
+const {Title} = Typography;
 
-const TodoList = ({ todos, selectedDate, onToggle, onEdit, onDelete }) => {
-  // 선택된 날짜의 할 일과 날짜 미지정 할 일 분리
-  const filteredTodos = todos.filter((todo) => {
-    if (!todo.dueDate) return false;
-    return (
-      dayjs(todo.dueDate).format("YYYY-MM-DD") ===
-      selectedDate?.format("YYYY-MM-DD")
-    );
+const TodoList = ({todos, selectedDate, onToggle, onEdit, onDelete}) => {
+  const filteredTodos = todos.filter(todo => {
+    if (!todo.startDate && !todo.endDate) {
+      // 날짜 미지정 할일은 항상 표시
+      return true;
+    }
+
+    if (!selectedDate) {
+      return false;
+    }
+
+    const selectedDateStr = selectedDate.format('YYYY-MM-DD');
+
+    // 시작일과 종료일이 모두 있는 경우
+    if (todo.startDate && todo.endDate) {
+      const start = dayjs(todo.startDate).startOf('day');
+      const end = dayjs(todo.endDate).startOf('day');
+      const selected = dayjs(selectedDateStr).startOf('day');
+      return selected.isSameOrAfter(start) && selected.isSameOrBefore(end);
+    }
+
+    // 시작일만 있는 경우
+    if (todo.startDate) {
+      return dayjs(todo.startDate).format('YYYY-MM-DD') === selectedDateStr;
+    }
+
+    // 종료일만 있는 경우
+    if (todo.endDate) {
+      return dayjs(todo.endDate).format('YYYY-MM-DD') === selectedDateStr;
+    }
+
+    return false;
   });
 
-  const undatedTodos = todos.filter((todo) => !todo.dueDate);
-
-  // 우선순위와 마감시간으로 정렬
-  const sortTodos = (todoList) => {
-    const priorityOrder = { HIGH: 3, MEDIUM: 2, LOW: 1 };
-    return [...todoList].sort((a, b) => {
-      // 먼저 우선순위로 정렬
-      if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-      }
-      // 우선순위가 같으면 마감시간으로 정렬
-      if (a.dueDate && b.dueDate) {
-        return dayjs(a.dueDate).diff(dayjs(b.dueDate));
-      }
-      // 마감시간이 없는 항목은 뒤로
-      if (!a.dueDate) return 1;
-      if (!b.dueDate) return -1;
-      return 0;
-    });
-  };
-
-  const sortedDateTodos = sortTodos(filteredTodos);
-  const sortedUndatedTodos = sortTodos(undatedTodos);
+  // 우선순위, 날짜로 정렬
+  const sortedTodos = [...filteredTodos].sort((a, b) => {
+    const priorityOrder = {HIGH: 3, MEDIUM: 2, LOW: 1};
+    if (priorityOrder[b.priority] !== priorityOrder[a.priority]) {
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    }
+    if (a.startDate && b.startDate) {
+      return dayjs(a.startDate).diff(dayjs(b.startDate));
+    }
+    return 0;
+  });
 
   return (
-    <div>
-      {selectedDate && (
-        <>
-          <Title level={4}>{selectedDate.format("YYYY년 MM월 DD일")}</Title>
-          <List
-            dataSource={sortedDateTodos}
-            renderItem={(todo) => (
-              <TodoItem
-                todo={todo}
-                onToggle={onToggle}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
+      <div>
+        <Title level={4}>
+          {selectedDate ? selectedDate.format('YYYY년 MM월 DD일') : '날짜 미지정 할일'}의 할
+          일
+        </Title>
+        <List
+            dataSource={sortedTodos}
+            renderItem={todo => (
+                <TodoItem
+                    todo={todo}
+                    onToggle={onToggle}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
             )}
-            locale={{ emptyText: "이 날의 할 일이 없습니다." }}
-          />
-        </>
-      )}
-
-      {sortedUndatedTodos.length > 0 && (
-        <>
-          <Divider />
-          <Title level={4}>날짜 미지정 할 일</Title>
-          <Text type="secondary" style={{ marginBottom: 16, display: "block" }}>
-            마감일이 지정되지 않은 할 일입니다
-          </Text>
-          <List
-            dataSource={sortedUndatedTodos}
-            renderItem={(todo) => (
-              <TodoItem
-                todo={todo}
-                onToggle={onToggle}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            )}
-          />
-        </>
-      )}
-    </div>
+            locale={{
+              emptyText: selectedDate
+                  ? '이 날의 할 일이 없습니다.'
+                  : '날짜 미지정 할 일이 없습니다.'
+            }}
+        />
+      </div>
   );
 };
 
