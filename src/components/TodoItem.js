@@ -1,11 +1,15 @@
 import React from "react";
 import {List, Checkbox, Button, Typography, Dropdown, Space} from "antd";
 import {MoreOutlined, CalendarOutlined} from "@ant-design/icons";
-import defaultTheme from "../constants/defaultTheme";
-import PRIORITY from "../constants/priority"
 import dayjs from "dayjs";
 
 const {Text} = Typography;
+
+const PRIORITY_COLORS = {
+  HIGH: "#f5222d",
+  MEDIUM: "#faad14",
+  LOW: "#52c41a",
+};
 
 const PRIORITY_LABELS = {
   HIGH: "높음",
@@ -33,10 +37,8 @@ const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
   return (
       <List.Item
           style={{
-            backgroundColor: todo.completed
-                ? defaultTheme.token.taskItemBgCompleted
-                : defaultTheme.token.taskItemBgActive,
-            borderLeft: `3px solid ${PRIORITY[todo.priority].color}`,
+            backgroundColor: todo.completed ? "#f5f5f5" : "white",
+            borderLeft: `3px solid ${PRIORITY_COLORS[todo.priority]}`,
             marginBottom: 8,
             padding: 12,
             borderRadius: 4,
@@ -53,30 +55,23 @@ const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
             <Text
                 style={{
                   textDecoration: todo.completed ? "line-through" : "none",
-                  color: todo.completed
-                      ? defaultTheme.token.taskItemTextCompleted
-                      : defaultTheme.token.taskItemTextActive,
+                  color: todo.completed ? "#999" : "inherit",
                 }}
             >
               {todo.text}
             </Text>
-
             <Space size={8}>
-              <Text type="secondary" style={{
-                fontSize: 12,
-                color:PRIORITY[todo.priority].color
-              }}>
-                {PRIORITY_LABELS[todo.priority]}
+              <Text type="secondary" style={{fontSize: 12}}>
+                우선순위: {PRIORITY_LABELS[todo.priority]}
               </Text>
               {(todo.startDate || todo.endDate) && (
-                  <Text type="secondary" style={{
-                    fontSize: 12,
-                    color: defaultTheme.token.taskItemTextSecondary
-                  }}>
+                  <Text type="secondary" style={{fontSize: 12}}>
                     <CalendarOutlined style={{marginRight: 4}}/>
-                    {todo.startDate && dayjs(todo.startDate).format('YYYY-MM-DD HH:mm')}
+                    {todo.startDate && dayjs(todo.startDate).format(
+                        'YYYY-MM-DD HH:mm')}
                     {todo.startDate && todo.endDate && ' ~ '}
-                    {todo.endDate && dayjs(todo.endDate).format('YYYY-MM-DD HH:mm')}
+                    {todo.endDate && dayjs(todo.endDate).format(
+                        'YYYY-MM-DD HH:mm')}
                   </Text>
               )}
             </Space>
