@@ -156,7 +156,7 @@ const App = () => {
               <Tooltip title="설정" placement="bottom">
                 <Button
                     type="text"
-                    icon={<MoreOutlined style={{fontSize: '24px'}}/>}
+                    icon={<MoreOutlined style={{fontSize: '22px'}}/>}
                     style={{
                       WebkitAppRegion: "no-drag",
                       color: theme.colorTextSecondary,
@@ -167,7 +167,7 @@ const App = () => {
               <Tooltip title="닫기" placement="bottom">
                 <Button
                     type="text"
-                    icon={<CloseOutlined style={{fontSize: '24px'}}/>}
+                    icon={<CloseOutlined style={{fontSize: '22px'}}/>}
                     onClick={() => window.electron.window.close()}
                     style={{
                       WebkitAppRegion: "no-drag",
