@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
   Layout,
   Flex,
-  Typography,
   Button,
   Space,
   ConfigProvider,
-  Card,
+  Tooltip
 } from "antd";
-import { PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  MoreOutlined, PlusCircleFilled,
+} from "@ant-design/icons";
 import "antd/dist/reset.css";
 import TodoCalendar from "./components/calender/index";
 import TodoList from "./components/TodoList";
@@ -23,7 +25,7 @@ dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isBetween);
 
-const { Header, Content } = Layout;
+const {Header, Content} = Layout;
 
 const App = () => {
   const [todos, setTodos] = useState(() => {
@@ -40,7 +42,7 @@ const App = () => {
 
   const getFilteredTodos = () => {
     const noDateTodos = todos.filter(
-      (todo) => !todo.startDate && !todo.endDate
+        (todo) => !todo.startDate && !todo.endDate
     );
 
     if (!selectedDate) {
@@ -86,24 +88,24 @@ const App = () => {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("새로운 할일:", newTodo);
+    console.log("새로운 할 일:", newTodo);
     setTodos((prev) => [...prev, newTodo]);
     setFormVisible(false);
   };
 
   const handleEditTodo = (values) => {
     setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === editingTodo.id
-          ? {
-              ...todo,
-              text: values.text,
-              priority: values.priority,
-              startDate: values.startDate,
-              endDate: values.endDate,
-            }
-          : todo
-      )
+        prev.map((todo) =>
+            todo.id === editingTodo.id
+                ? {
+                  ...todo,
+                  text: values.text,
+                  priority: values.priority,
+                  startDate: values.startDate,
+                  endDate: values.endDate,
+                }
+                : todo
+        )
     );
     setEditingTodo(null);
   };
@@ -115,95 +117,113 @@ const App = () => {
   const theme = defaultTheme.token;
 
   return (
-    <ConfigProvider
-      theme={{
-        ...defaultTheme,
-      }}>
-      <Layout
-        style={{
-          padding: "10px 5px",
-          minHeight: "100vh",
-        }}>
-        <Header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "transparent",
-            width: "100%",
-            WebkitAppRegion: "drag",
-            padding: "0 20px",
-            margin: "0 auto",
+      <ConfigProvider
+          theme={{
+            ...defaultTheme,
           }}>
-          <Space
+        <Layout
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
+              padding: "10px 5px",
+              minHeight: "100vh",
             }}>
-            <Typography.Title level={3} style={{ margin: 0, fontWeight: 900 }}>
-              할 일 캘린더
-            </Typography.Title>
-            <Button
-              type="text"
-              icon={<SettingOutlined size={10} />}
-              style={{ color: theme.colorTextSecondary }}></Button>
-          </Space>
+          <Header
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "transparent",
+                width: "100%",
+                WebkitAppRegion: "drag",
+                padding: "0 20px",
+                margin: "0 auto",
+              }}>
+            <Tooltip title="할 일 추가" placement="bottom">
+              <Button
+                  icon={<PlusCircleFilled style={{fontSize: '24px'}}/>}
+                  onClick={() => setFormVisible(true)}
+                  style={{
+                    WebkitAppRegion: "no-drag",
+                    color: theme.colorTextSecondary,
+                    background: 'transparent',
+                    border: "none",
+                  }}
+              />
+            </Tooltip>
 
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => setFormVisible(true)}
-            style={{
-              WebkitAppRegion: "no-drag",
-              color: theme.colorBgBase,
-              background: theme.colorInfo,
-            }}></Button>
-        </Header>
+            <Space style={{flex: 1}}/>
 
-        <Content style={{ padding: "20px" }}>
-          <Flex
-            gap="large"
-            vertical
-            style={{
-              borderRadius: theme.borderRadius,
-            }}>
-            <TodoCalendar
-              todos={todos}
-              selectedDate={selectedDate}
-              onSelect={(date) => setSelectedDate(date)}
-            />
+            <Space>
+              <Tooltip title="설정" placement="bottom">
+                <Button
+                    type="text"
+                    icon={<MoreOutlined style={{fontSize: '24px'}}/>}
+                    style={{
+                      WebkitAppRegion: "no-drag",
+                      color: theme.colorTextSecondary,
+                    }}
+                />
+              </Tooltip>
 
-            <TodoList
-              todos={getFilteredTodos()}
-              selectedDate={selectedDate}
-              onToggle={(id) => {
-                setTodos((prev) =>
-                  prev.map((todo) =>
-                    todo.id === id
-                      ? { ...todo, completed: !todo.completed }
-                      : todo
-                  )
-                );
+              <Tooltip title="닫기" placement="bottom">
+                <Button
+                    type="text"
+                    icon={<CloseOutlined style={{fontSize: '24px'}}/>}
+                    onClick={() => window.electron.window.close()}
+                    style={{
+                      WebkitAppRegion: "no-drag",
+                      color: theme.colorTextSecondary
+                    }}
+                />
+              </Tooltip>
+            </Space>
+          </Header>
+
+          <Content style={{
+            padding: "20px"
+          }}>
+            <Flex
+                gap="large"
+                vertical
+                style={{
+                  borderRadius: theme.borderRadius,
+                }}>
+              <TodoCalendar
+                  todos={todos}
+                  selectedDate={selectedDate}
+                  onSelect={(date) => setSelectedDate(date)}
+              />
+
+              <TodoList
+                  todos={getFilteredTodos()}
+                  selectedDate={selectedDate}
+                  onToggle={(id) => {
+                    setTodos((prev) =>
+                        prev.map((todo) =>
+                            todo.id === id
+                                ? {...todo, completed: !todo.completed}
+                                : todo
+                        )
+                    );
+                  }}
+                  onEdit={handleEdit}
+                  onDelete={(id) => {
+                    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+                  }}
+              />
+            </Flex>
+          </Content>
+
+          <TodoForm
+              visible={formVisible || !!editingTodo}
+              initialValues={editingTodo}
+              onSubmit={editingTodo ? handleEditTodo : handleAddTodo}
+              onCancel={() => {
+                setFormVisible(false);
+                setEditingTodo(null);
               }}
-              onEdit={handleEdit}
-              onDelete={(id) => {
-                setTodos((prev) => prev.filter((todo) => todo.id !== id));
-              }}
-            />
-          </Flex>
-        </Content>
-
-        <TodoForm
-          visible={formVisible || !!editingTodo}
-          initialValues={editingTodo}
-          onSubmit={editingTodo ? handleEditTodo : handleAddTodo}
-          onCancel={() => {
-            setFormVisible(false);
-            setEditingTodo(null);
-          }}
-        />
-      </Layout>
-    </ConfigProvider>
+          />
+        </Layout>
+      </ConfigProvider>
   );
 };
 

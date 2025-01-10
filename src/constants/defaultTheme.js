@@ -1,75 +1,93 @@
+import tokyoNight from './tokyoNight';
+
 const defaultTheme = {
   token: {
-    fontFamily: "Pretendard, sans-serif", // Default font
+    fontFamily: "Pretendard, sans-serif",
 
     // Base Colors
-    colorPrimary: "#ff7edb", // Neon pink - primary actions and highlights
-    colorSuccess: "#72f1b8", // Neon green - success states
-    colorWarning: "#fede5d", // Neon yellow - warnings
-    colorError: "#fe4450", // Bright red - errors
-    colorInfo: "#36f9f6", // Cyan - info states
+    colorPrimary: tokyoNight.purple,      // 주요 액션 컬러
+    colorSuccess: tokyoNight.green,       // 성공
+    colorWarning: tokyoNight.yellow,      // 경고
+    colorError: tokyoNight.red,           // 에러
+    colorInfo: tokyoNight.cyan,           // 정보
 
     // Neutral Colors
-    colorTextBase: "#ffffff", // White text
-    colorBgBase: "#262335", // Deep purple background
+    colorTextBase: tokyoNight.foreground,
+    colorBgBase: tokyoNight.background,
 
     // Component Colors
-    colorBorder: "#495495", // Muted blue for borders
-    colorBorderSecondary: "#383d5d", // Darker blue for secondary borders
+    colorBorder: tokyoNight.brightBlack,
+    colorBorderSecondary: tokyoNight.black,
 
     // Functional Colors
-    colorLink: "#36f9f6", // Cyan for links
-    colorLinkHover: "#ff7edb", // Pink hover state
-    colorLinkActive: "#ff7edb", // Pink active state
+    colorLink: tokyoNight.blue,
+    colorLinkHover: tokyoNight.brightBlue,
+    colorLinkActive: tokyoNight.brightBlue,
 
     // Status Colors
-    colorSuccessText: "#72f1b8",
-    colorSuccessBg: "#072f2f",
-    colorWarningText: "#fede5d",
-    colorWarningBg: "#2f2f07",
-    colorErrorText: "#fe4450",
-    colorErrorBg: "#2f0707",
-    colorInfoText: "#36f9f6",
-    colorInfoBg: "#072f2f",
+    colorSuccessText: tokyoNight.green,
+    colorSuccessBg: tokyoNight.black,
+    colorWarningText: tokyoNight.yellow,
+    colorWarningBg: tokyoNight.black,
+    colorErrorText: tokyoNight.red,
+    colorErrorBg: tokyoNight.black,
+    colorInfoText: tokyoNight.cyan,
+    colorInfoBg: tokyoNight.black,
 
     // Background Variations
-    colorBgContainer: "#2a2139", // Slightly lighter than base for containers
-    colorBgElevated: "#34294f", // Elevated components like cards
-    colorBgSpotlight: "#461e5c", // Spotlight/focus areas
+    colorBgContainer: tokyoNight.black,
+    colorBgElevated: tokyoNight.selectionBackground,
+    colorBgSpotlight: tokyoNight.brightBlack,
 
     // Text Variations
-    colorText: "#ffffff", // Primary text
-    colorTextSecondary: "#b6b6b6", // Secondary text
-    colorTextTertiary: "#8e8e8e", // Tertiary text
-    colorTextQuaternary: "#6e6e6e", // Disabled text
+    colorText: tokyoNight.foreground,
+    colorTextSecondary: tokyoNight.white,
+    colorTextTertiary: tokyoNight.brightBlack,
+    colorTextQuaternary: tokyoNight.black,
 
     // Component-specific
-    controlOutline: "#ff7edb40", // Focus outline with opacity
-    colorPrimaryHover: "#ff9fe9", // Lighter pink for hover states
-    colorPrimaryActive: "#ff5ed2", // Darker pink for active states
+    controlOutline: `${tokyoNight.purple}40`,
+    colorPrimaryHover: tokyoNight.brightPurple,
+    colorPrimaryActive: tokyoNight.purple,
 
-    // Additional Customization
-    borderRadius: 6, // Rounded corners
-    wireframe: false, // Enable for more depth
+    // Task Item Colors
+    taskItemBgActive: tokyoNight.black,        // 미완료 할일 배경
+    taskItemBgCompleted: tokyoNight.brightBlack,  // 완료된 할일 배경
+
+    // Task Item Text Colors
+    taskItemTextActive: tokyoNight.foreground,   // 미완료 할일 텍스트
+    taskItemTextCompleted: tokyoNight.white,     // 완료된 할일 텍스트
+    taskItemTextSecondary: tokyoNight.white,     // 부가 정보 텍스트 (우선순위, 날짜 등)
+
+    calenderSundayTxt: tokyoNight.red,
+    calenderSaturdayTxt: tokyoNight.cyan,
+    calenderWeekdayTxt: tokyoNight.foreground,
+    calenderTodayBg: tokyoNight.white,
+    calenderDayBg: tokyoNight.background,
+    calenderNotThisMonth: tokyoNight.blue,
+    calenderSelectedDate: tokyoNight.red,
+
+    borderRadius: 6,
+    wireframe: false,
   },
   components: {
     Button: {
-      colorPrimary: "#ff7edb",
-      algorithm: true, // Enable algorithm
+      colorPrimary: tokyoNight.purple,
+      algorithm: true,
     },
     Input: {
-      colorBgContainer: "#34294f",
-      colorBorder: "#495495",
+      colorBgContainer: tokyoNight.black,
+      colorBorder: tokyoNight.brightBlack,
     },
     Card: {
-      colorBgContainer: "#34294f",
+      colorBgContainer: tokyoNight.black,
     },
     Select: {
-      colorBgContainer: "#34294f",
-      colorBorder: "#495495",
+      colorBgContainer: tokyoNight.black,
+      colorBorder: tokyoNight.brightBlack,
     },
     Modal: {
-      colorBgElevated: "#34294f",
+      colorBgElevated: tokyoNight.black,
     },
   },
 };
