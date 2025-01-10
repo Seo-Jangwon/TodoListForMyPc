@@ -59,7 +59,7 @@ const WeekView = ({
               onClick={() => navigateWeek(1)}
               style={{
                 backgroundColor: 'transparent',
-                color: theme.colorPrimary,
+                color: theme.calenderSelectedDate,
                 border: 'none'
               }}
           />
@@ -92,7 +92,7 @@ const WeekView = ({
                           : theme.colorBgBase,
                       border: date.format("YYYY-MM-DD")
                       === selectedDate?.format("YYYY-MM-DD")
-                          ? `2px solid ${theme.calenderSelectedDate}`
+                          ? `2px solid ${theme.colorPrimary}`
                           : "none",
                     }}>
                   <div
