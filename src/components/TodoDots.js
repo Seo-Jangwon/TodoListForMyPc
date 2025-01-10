@@ -68,7 +68,7 @@ const TodoDots = ({ todos, date }) => {
         style={{
           display: "flex",
           flexWrap: "wrap",
-          gap: "4px",
+          gap: "3.5px",
           marginTop: "1px",
           padding: "0 6px",
         }}>
@@ -80,8 +80,8 @@ const TodoDots = ({ todos, date }) => {
                   <span
                     key={idx}
                     style={{
-                      width: "7px",
-                      height: "7px",
+                      width: "6.5px",
+                      height: "6.5px",
                       borderRadius: "50%",
                       backgroundColor: priorityColors[priority],
                       display: "inline-block",
