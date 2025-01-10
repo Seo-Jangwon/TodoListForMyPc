@@ -74,7 +74,7 @@ const TodoList = ({todos, selectedDate, onToggle, onEdit, onDelete}) => {
         </div>
 
         <div>
-          <Title level={4}>날짜 미지정 할 일</Title>
+          <Title level={4}>날짜 미지정 할일</Title>
           <List
               dataSource={sortByPriority(datelessTodos)}
               renderItem={todo => (
