@@ -5,7 +5,7 @@
 ## 개발
 
 - 프로젝트 리더 & Electron 프론트엔드 화면 설계 및 구현, 백엔드 기능 구현: [서장원](https://github.com/Seo-Jangwon)
-- 디자인, 프론트엔드 화면 설계 및 구현: [민서령](https://github.com/seoryeong-min)
+- 디자인, 프론트엔드 화면 설계 및 구현: [민서령](https://github.com/SeoryeongMin)
 
 ## 기능
 

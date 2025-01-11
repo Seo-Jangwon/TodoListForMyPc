@@ -263,7 +263,6 @@ const App = () => {
                 setEditingTodo(null);
               }}
           />
-
           <SettingsModal
               visible={settingVisible}
               onClose={() => setSettingVisible(false)}

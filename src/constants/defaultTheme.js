@@ -91,6 +91,7 @@ const createTheme = (colorTheme) => ({
     },
   },
 });
+
 export const getTheme = (themeName = 'tokyoNight') => {
   return createTheme(themes[themeName]);
 };
