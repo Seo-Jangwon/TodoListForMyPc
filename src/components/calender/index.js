@@ -1,17 +1,16 @@
 import React, {useState} from "react";
-import {Card, Radio, Button, Flex} from "antd";
+import {Card, Radio, Button, Flex, theme} from "antd";
 import WeekView from "./WeekView";
 import MonthView from "./MonthView";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import defaultTheme from "../../constants/defaultTheme";
 
 dayjs.locale("ko");
 
 const TodoCalendar = ({todos, selectedDate, onSelect}) => {
   const [viewMode, setViewMode] = useState("week");
   const [currentDate, setCurrentDate] = useState(dayjs());
-  const theme = defaultTheme.token;
+  const {token} = theme.useToken();
 
   return (
       <Card
@@ -32,7 +31,7 @@ const TodoCalendar = ({todos, selectedDate, onSelect}) => {
                     onSelect(dayjs());
                   }}
                   style={{
-                    color: theme.colorPrimary,
+                    color: token.colorPrimary,
                     padding: '4px 8px',
                     fontSize: '0.85rem'
                   }}>

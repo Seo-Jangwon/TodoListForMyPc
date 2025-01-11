@@ -1,7 +1,7 @@
 import React from "react";
 import {List, Checkbox, Button, Typography, Dropdown, Space} from "antd";
 import {MoreOutlined, CalendarOutlined} from "@ant-design/icons";
-import defaultTheme from "../constants/defaultTheme";
+import { theme } from 'antd';
 import PRIORITY from "../constants/priority"
 import dayjs from "dayjs";
 
@@ -14,6 +14,7 @@ const PRIORITY_LABELS = {
 };
 
 const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
+  const { token } = theme.useToken();
   const menuItems = {
     items: [
       {
@@ -34,8 +35,8 @@ const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
       <List.Item
           style={{
             backgroundColor: todo.completed
-                ? defaultTheme.token.taskItemBgCompleted
-                : defaultTheme.token.taskItemBgActive,
+                ? token.taskItemBgCompleted
+                : token.taskItemBgActive,
             borderLeft: `3px solid ${PRIORITY[todo.priority].color}`,
             marginBottom: 8,
             padding: 12,
@@ -54,8 +55,8 @@ const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
                 style={{
                   textDecoration: todo.completed ? "line-through" : "none",
                   color: todo.completed
-                      ? defaultTheme.token.taskItemTextCompleted
-                      : defaultTheme.token.taskItemTextActive,
+                      ? token.taskItemTextCompleted
+                      : token.taskItemTextActive,
                 }}
             >
               {todo.text}
@@ -71,7 +72,7 @@ const TodoItem = ({todo, onToggle, onEdit, onDelete}) => {
               {(todo.startDate || todo.endDate) && (
                   <Text type="secondary" style={{
                     fontSize: 12,
-                    color: defaultTheme.token.taskItemTextSecondary
+                    color: token.taskItemTextSecondary
                   }}>
                     <CalendarOutlined style={{marginRight: 4}}/>
                     {todo.startDate && dayjs(todo.startDate).format('YYYY-MM-DD HH:mm')}

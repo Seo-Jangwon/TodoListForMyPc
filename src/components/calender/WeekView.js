@@ -1,12 +1,11 @@
 import React from "react";
-import {Button, Flex, Typography} from "antd";
+import {Button, Flex, Typography, theme} from "antd";
 import {LeftOutlined, RightOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isBetween from "dayjs/plugin/isBetween";
 import TodoDots from "../TodoDots";
-import defaultTheme from "../../constants/defaultTheme";
 import {getDateStyle} from "../../constants/calendarStyles";
 
 dayjs.extend(isSameOrAfter);
@@ -20,6 +19,9 @@ const WeekView = ({
   setCurrentDate,
   onSelect
 }) => {
+
+  const {token} = theme.useToken();
+
   const getWeekDays = () => {
     const startOfWeek = currentDate.startOf("week");
     return Array.from({length: 7}, (_, i) => startOfWeek.add(i, "day"));
@@ -35,7 +37,6 @@ const WeekView = ({
 
   const weekDays = getWeekDays();
   const today = dayjs();
-  const theme = defaultTheme.token;
 
   return (
       <Flex vertical gap="middle" style={{width: "100%"}}>
@@ -45,7 +46,7 @@ const WeekView = ({
               onClick={() => navigateWeek(-1)}
               style={{
                 backgroundColor: 'transparent',
-                color: theme.colorPrimary,
+                color: token.colorPrimary,
                 border: 'none'
               }}
           />
@@ -59,7 +60,7 @@ const WeekView = ({
               onClick={() => navigateWeek(1)}
               style={{
                 backgroundColor: 'transparent',
-                color: theme.colorPrimary,
+                color: token.colorPrimary,
                 border: 'none'
               }}
           />
@@ -73,7 +74,7 @@ const WeekView = ({
               gap: 8,
             }}>
           {weekDays.map((date) => {
-            const dateStyle = getDateStyle(date, today, theme, "w");
+            const dateStyle = getDateStyle(date, today, token, "w");
 
             return (
                 <div
@@ -86,14 +87,14 @@ const WeekView = ({
                       textAlign: "center",
                       borderRadius: 5,
                       cursor: "pointer",
-                      backgroundColor: date.format("YYYY-MM-DD")
-                      === today.format("YYYY-MM-DD")
-                          ? theme.calenderTodayBg
-                          : theme.colorBgBase,
-                      border: date.format("YYYY-MM-DD")
-                      === selectedDate?.format("YYYY-MM-DD")
-                          ? `2px solid ${theme.calenderSelectedDate}`
-                          : "none",
+                      backgroundColor: token.colorBgBase,
+                      border: date.format("YYYY-MM-DD") === selectedDate?.format("YYYY-MM-DD")
+                          ? `2px solid ${date.format("YYYY-MM-DD") === today.format("YYYY-MM-DD")
+                              ? token.calenderTodayBorder
+                              : token.calenderSelectedDate}`
+                          : date.format("YYYY-MM-DD") === today.format("YYYY-MM-DD")
+                              ? `2px solid ${token.calenderTodayBorder}`
+                              : "none",
                     }}>
                   <div
                       style={{

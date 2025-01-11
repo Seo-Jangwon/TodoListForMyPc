@@ -2,14 +2,9 @@ import React from "react";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import PRIORITY from "../constants/priority"
 
 dayjs.extend(isBetween);
-
-const priorityColors = {
-  HIGH: "#ff4d4f",
-  MEDIUM: "#faad14",
-  LOW: "#52c41a",
-};
 
 const priorityLabels = {
   HIGH: "높음",
@@ -80,7 +75,7 @@ const TodoDots = ({ todos, date }) => {
                       width: "6.5px",
                       height: "6.5px",
                       borderRadius: "50%",
-                      backgroundColor: priorityColors[priority],
+                      backgroundColor: PRIORITY[priority].color,
                       display: "inline-block",
                     }}
                   />

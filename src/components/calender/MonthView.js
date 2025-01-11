@@ -1,12 +1,11 @@
 import React from "react";
-import {Calendar, Button, Flex, Typography} from "antd";
+import {Calendar, Button, Flex, Typography, theme} from "antd";
 import {LeftOutlined, RightOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isBetween from "dayjs/plugin/isBetween";
 import TodoDots from "../TodoDots";
-import defaultTheme from "../../constants/defaultTheme";
 import locale from 'antd/es/calendar/locale/ko_KR';
 import {getDateStyle} from "../../constants/calendarStyles";
 
@@ -21,6 +20,9 @@ const MonthView = ({
   setCurrentDate,
   onSelect
 }) => {
+
+  const {token} = theme.useToken();
+
   const navigateMonth = (direction) => {
     if (setCurrentDate) {
       setCurrentDate((prev) => prev.add(direction, "month"));
@@ -32,7 +34,7 @@ const MonthView = ({
   };
 
   const dateCellRender = (value) => {
-    const style = getDateStyle(value, currentDate, theme, "m");
+    const style = getDateStyle(value, currentDate, token, "m");  // theme -> token
 
     return (
         <div style={{marginTop: "8px", padding: "0 4px"}}>
@@ -41,17 +43,20 @@ const MonthView = ({
             minHeight: "40px",
             maxHeight: "40px",
             padding: "2px 4px",
-            background: value.format("YYYY-MM-DD") === dayjs().format(
-                "YYYY-MM-DD")
-                ? theme.calenderTodayBg
-                : value.format("M") !== currentDate.format("M")
-                    ? theme.colorBgSpotlight
-                    : theme.colorBgBase,
+            background: value.format("YYYY-MM") !== currentDate.format(
+                "YYYY-MM")
+                ? token.colorBgSpotlight
+                : token.colorBgBase,
             borderRadius: "4px",
             border: value.format("YYYY-MM-DD") === selectedDate?.format(
                 "YYYY-MM-DD")
-                ? `2px solid ${theme.calenderSelectedDate}`
-                : "none",
+                ? `2px solid ${value.format("YYYY-MM-DD") === dayjs().format(
+                    "YYYY-MM-DD")
+                    ? token.calenderTodayBorder
+                    : token.calenderSelectedDate}`
+                : value.format("YYYY-MM-DD") === dayjs().format("YYYY-MM-DD")
+                    ? `2px solid ${token.calenderTodayBorder}`
+                    : "none",
           }}>
             <p style={{
               ...style,
@@ -71,8 +76,6 @@ const MonthView = ({
     );
   };
 
-  const theme = defaultTheme.token;
-
   return (
       <Flex vertical gap="middle" style={{width: "100%"}}>
         <Flex justify="space-between" align="center">
@@ -81,7 +84,7 @@ const MonthView = ({
               onClick={() => navigateMonth(-1)}
               style={{
                 backgroundColor: 'transparent',
-                color: theme.colorPrimary,
+                color: token.colorPrimary,
                 border: 'none'
               }}
           />
@@ -93,7 +96,7 @@ const MonthView = ({
               onClick={() => navigateMonth(1)}
               style={{
                 backgroundColor: 'transparent',
-                color: theme.colorPrimary,
+                color: token.colorPrimary,
                 border: 'none'
               }}
           />

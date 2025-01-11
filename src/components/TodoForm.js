@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
-import {Modal, Form, Input, Select, DatePicker, Space} from 'antd';
+import {Modal, Form, Input, Select, DatePicker, Space, theme} from 'antd';
 import dayjs from 'dayjs';
 
 const {Option} = Select;
 
 const TodoForm = ({visible, initialValues = null, onSubmit, onCancel}) => {
   const [form] = Form.useForm();
+  const {token} = theme.useToken();
 
   useEffect(() => {
     if (visible) {
@@ -75,7 +76,20 @@ const TodoForm = ({visible, initialValues = null, onSubmit, onCancel}) => {
           onCancel={() => {
             form.resetFields();
             onCancel();
-          }}
+          }} styles={{
+        content: {
+          background: token.colorBgContainer,
+        },
+        header: {
+          background: token.colorBgContainer,
+        },
+        body: {
+          background: token.colorBgContainer,
+        },
+        footer: {
+          background: token.colorBgContainer,
+        }
+      }}
       >
         <Form form={form} layout="vertical">
           <Form.Item

@@ -5,7 +5,8 @@ import {
   Button,
   Space,
   ConfigProvider,
-  Tooltip
+  Tooltip,
+  theme
 } from "antd";
 import {
   CloseOutlined,
@@ -19,7 +20,6 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isBetween from "dayjs/plugin/isBetween";
-import defaultTheme from "./constants/defaultTheme";
 import SettingsModal from "./components/settings";
 import {signInWithGoogle, signOut} from './firebase/auth';
 import {getTheme} from "./constants/defaultTheme";
@@ -39,6 +39,7 @@ const App = () => {
   const [formVisible, setFormVisible] = useState(false);
   const [editingTodo, setEditingTodo] = useState(null);
   const [settingVisible, setSettingVisible] = useState(false); // 세팅창 보일지 말지
+  const {token} = theme.useToken();
 
   //=================================================================
   // 로그인 상태 관리
@@ -161,8 +162,6 @@ const App = () => {
     setEditingTodo(todo);
   };
 
-  const theme = defaultTheme.token;
-
   return (
       <ConfigProvider theme={getTheme(currentTheme)}>
         <Layout style={{padding: "10px 5px", minHeight: "100vh"}}>
@@ -183,7 +182,7 @@ const App = () => {
                   onClick={() => setFormVisible(true)}
                   style={{
                     WebkitAppRegion: "no-drag",
-                    color: theme.colorTextSecondary,
+                    color: theme.colorText,
                     background: 'transparent',
                     border: "none",
                   }}
@@ -226,7 +225,7 @@ const App = () => {
                 gap="large"
                 vertical
                 style={{
-                  borderRadius: theme.borderRadius,
+                  borderRadius: token.borderRadius,
                 }}>
               <TodoCalendar
                   todos={todos}
@@ -263,6 +262,7 @@ const App = () => {
                 setEditingTodo(null);
               }}
           />
+
           <SettingsModal
               visible={settingVisible}
               onClose={() => setSettingVisible(false)}
