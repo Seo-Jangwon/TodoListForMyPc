@@ -62,10 +62,10 @@ const createTheme = (colorTheme) => ({
     calenderSundayTxt: colorTheme.red,
     calenderSaturdayTxt: colorTheme.cyan,
     calenderWeekdayTxt: colorTheme.foreground,
-    calenderTodayBg: colorTheme.white,
+    calenderTodayBorder: colorTheme.red,
     calenderDayBg: colorTheme.background,
     calenderNotThisMonth: colorTheme.blue,
-    calenderSelectedDate: colorTheme.red,
+    calenderSelectedDate: colorTheme.yellow,
 
     borderRadius: 6,
     wireframe: false,

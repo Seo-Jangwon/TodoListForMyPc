@@ -2,6 +2,7 @@ import React from 'react';
 import {Modal, Space} from 'antd';
 import LoginSection from './LoginSection';
 import ThemeSection from './ThemeSection';
+import {themeNames} from '../../constants/colorThemes';
 
 const SettingsModal = ({
   visible,
@@ -28,8 +29,10 @@ const SettingsModal = ({
           <ThemeSection
               currentTheme={currentTheme}
               onThemeChange={onThemeChange}
+              themes={themeNames}
           />
         </Space>
+
       </Modal>
   );
 };
