@@ -1,95 +1,99 @@
-import tokyoNight from './tokyoNight';
+import {themes} from './colorThemes'
 
-const defaultTheme = {
+const createTheme = (colorTheme) => ({
   token: {
     fontFamily: "Pretendard, sans-serif",
 
     // Base Colors
-    colorPrimary: tokyoNight.purple,      // 주요 액션 컬러
-    colorSuccess: tokyoNight.green,       // 성공
-    colorWarning: tokyoNight.yellow,      // 경고
-    colorError: tokyoNight.red,           // 에러
-    colorInfo: tokyoNight.cyan,           // 정보
+    colorPrimary: colorTheme.purple,      // 주요 액션 컬러
+    colorSuccess: colorTheme.green,       // 성공
+    colorWarning: colorTheme.yellow,      // 경고
+    colorError: colorTheme.red,           // 에러
+    colorInfo: colorTheme.cyan,           // 정보
 
     // Neutral Colors
-    colorTextBase: tokyoNight.foreground,
-    colorBgBase: tokyoNight.background,
+    colorTextBase: colorTheme.foreground,
+    colorBgBase: colorTheme.background,
 
     // Component Colors
-    colorBorder: tokyoNight.brightBlack,
-    colorBorderSecondary: tokyoNight.black,
+    colorBorder: colorTheme.brightBlack,
+    colorBorderSecondary: colorTheme.black,
 
     // Functional Colors
-    colorLink: tokyoNight.blue,
-    colorLinkHover: tokyoNight.brightBlue,
-    colorLinkActive: tokyoNight.brightBlue,
+    colorLink: colorTheme.blue,
+    colorLinkHover: colorTheme.brightBlue,
+    colorLinkActive: colorTheme.brightBlue,
 
     // Status Colors
-    colorSuccessText: tokyoNight.green,
-    colorSuccessBg: tokyoNight.black,
-    colorWarningText: tokyoNight.yellow,
-    colorWarningBg: tokyoNight.black,
-    colorErrorText: tokyoNight.red,
-    colorErrorBg: tokyoNight.black,
-    colorInfoText: tokyoNight.cyan,
-    colorInfoBg: tokyoNight.black,
+    colorSuccessText: colorTheme.green,
+    colorSuccessBg: colorTheme.black,
+    colorWarningText: colorTheme.yellow,
+    colorWarningBg: colorTheme.black,
+    colorErrorText: colorTheme.red,
+    colorErrorBg: colorTheme.black,
+    colorInfoText: colorTheme.cyan,
+    colorInfoBg: colorTheme.black,
 
     // Background Variations
-    colorBgContainer: tokyoNight.black,
-    colorBgElevated: tokyoNight.selectionBackground,
-    colorBgSpotlight: tokyoNight.brightBlack,
+    colorBgContainer: colorTheme.black,
+    colorBgElevated: colorTheme.selectionBackground,
+    colorBgSpotlight: colorTheme.brightBlack,
 
     // Text Variations
-    colorText: tokyoNight.foreground,
-    colorTextSecondary: tokyoNight.white,
-    colorTextTertiary: tokyoNight.brightBlack,
-    colorTextQuaternary: tokyoNight.black,
+    colorText: colorTheme.foreground,
+    colorTextSecondary: colorTheme.white,
+    colorTextTertiary: colorTheme.brightBlack,
+    colorTextQuaternary: colorTheme.black,
 
     // Component-specific
-    controlOutline: `${tokyoNight.purple}40`,
-    colorPrimaryHover: tokyoNight.brightPurple,
-    colorPrimaryActive: tokyoNight.purple,
+    controlOutline: `${colorTheme.purple}40`,
+    colorPrimaryHover: colorTheme.brightPurple,
+    colorPrimaryActive: colorTheme.purple,
 
     // Task Item Colors
-    taskItemBgActive: tokyoNight.black,        // 미완료 할일 배경
-    taskItemBgCompleted: tokyoNight.brightBlack,  // 완료된 할일 배경
+    taskItemBgActive: colorTheme.black,        // 미완료 할일 배경
+    taskItemBgCompleted: colorTheme.brightBlack,  // 완료된 할일 배경
 
     // Task Item Text Colors
-    taskItemTextActive: tokyoNight.foreground,   // 미완료 할일 텍스트
-    taskItemTextCompleted: tokyoNight.white,     // 완료된 할일 텍스트
-    taskItemTextSecondary: tokyoNight.white,     // 부가 정보 텍스트 (우선순위, 날짜 등)
+    taskItemTextActive: colorTheme.foreground,   // 미완료 할일 텍스트
+    taskItemTextCompleted: colorTheme.white,     // 완료된 할일 텍스트
+    taskItemTextSecondary: colorTheme.white,     // 부가 정보 텍스트 (우선순위, 날짜 등)
 
-    calenderSundayTxt: tokyoNight.red,
-    calenderSaturdayTxt: tokyoNight.cyan,
-    calenderWeekdayTxt: tokyoNight.foreground,
-    calenderTodayBg: tokyoNight.white,
-    calenderDayBg: tokyoNight.background,
-    calenderNotThisMonth: tokyoNight.blue,
-    calenderSelectedDate: tokyoNight.red,
+    calenderSundayTxt: colorTheme.red,
+    calenderSaturdayTxt: colorTheme.cyan,
+    calenderWeekdayTxt: colorTheme.foreground,
+    calenderTodayBg: colorTheme.white,
+    calenderDayBg: colorTheme.background,
+    calenderNotThisMonth: colorTheme.blue,
+    calenderSelectedDate: colorTheme.red,
 
     borderRadius: 6,
     wireframe: false,
   },
   components: {
     Button: {
-      colorPrimary: tokyoNight.purple,
+      colorPrimary: colorTheme.purple,
       algorithm: true,
     },
     Input: {
-      colorBgContainer: tokyoNight.black,
-      colorBorder: tokyoNight.brightBlack,
+      colorBgContainer: colorTheme.black,
+      colorBorder: colorTheme.brightBlack,
     },
     Card: {
-      colorBgContainer: tokyoNight.black,
+      colorBgContainer: colorTheme.black,
     },
     Select: {
-      colorBgContainer: tokyoNight.black,
-      colorBorder: tokyoNight.brightBlack,
+      colorBgContainer: colorTheme.black,
+      colorBorder: colorTheme.brightBlack,
     },
     Modal: {
-      colorBgElevated: tokyoNight.black,
+      colorBgElevated: colorTheme.black,
     },
   },
+});
+
+export const getTheme = (themeName = 'tokyoNight') => {
+  return createTheme(themes[themeName]);
 };
 
-export default defaultTheme;
+export default getTheme('tokyoNight');

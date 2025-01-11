@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Notification } = require("electron");
+const {app, BrowserWindow, ipcMain, Notification} = require("electron");
 const path = require("path");
 
 let mainWindow;
@@ -18,10 +18,39 @@ function createWindow() {
     },
   });
 
+  // OAuth 로그인을 위한 창 생성
+  function createAuthWindow() {
+    const authWindow = new BrowserWindow({
+      width: 500,
+      height: 600,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    });
+
+    // OAuth 로그인 결과 처리
+    ipcMain.handle('google-auth', async (event, authUrl) => {
+      return new Promise((resolve, reject) => {
+        authWindow.loadURL(authUrl);
+
+        authWindow.webContents.on('will-redirect', (event, url) => {
+          if (url.startsWith('your-redirect-url')) {
+            // OAuth 토큰 처리
+            const rawCode = /code=([^&]*)/.exec(url) || null;
+            const code = rawCode && rawCode.length > 1 ? rawCode[1] : null;
+            authWindow.destroy();
+            resolve(code);
+          }
+        });
+      });
+    });
+  }
+
   // React 앱 로드
   const startUrl =
-    process.env.ELECTRON_START_URL ||
-    `file://${path.join(__dirname, "../build/index.html")}`;
+      process.env.ELECTRON_START_URL ||
+      `file://${path.join(__dirname, "../build/index.html")}`;
   mainWindow.loadURL(startUrl);
 
   // 개발 환경에서만 개발자 도구 활성화
@@ -47,7 +76,7 @@ function createWindow() {
   });
 
   // 알림 이벤트 리스너
-  ipcMain.on("show-notification", (event, { title, body }) => {
+  ipcMain.on("show-notification", (event, {title, body}) => {
     if (Notification.isSupported()) {
       new Notification({
         title,
@@ -58,19 +87,19 @@ function createWindow() {
   });
 
   mainWindow.webContents.session.webRequest.onHeadersReceived(
-    (details, callback) => {
-      callback({
-        responseHeaders: {
-          ...details.responseHeaders,
-          "Content-Security-Policy": [
-            "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-            "style-src 'self' 'unsafe-inline'",
-            "img-src 'self' data: https://secure.gravatar.com",
-          ].join("; "),
-        },
-      });
-    }
+      (details, callback) => {
+        callback({
+          responseHeaders: {
+            ...details.responseHeaders,
+            "Content-Security-Policy": [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https://secure.gravatar.com",
+            ].join("; "),
+          },
+        });
+      }
   );
 }
 

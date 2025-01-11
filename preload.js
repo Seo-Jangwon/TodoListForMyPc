@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electron', {
   window: {
     minimize: () => ipcRenderer.send('window-minimize'),
     maximize: () => ipcRenderer.send('window-maximize'),
+    googleAuth: (authUrl) => ipcRenderer.invoke('google-auth', authUrl),
     close: () => ipcRenderer.send('window-close'),
   }
 });
