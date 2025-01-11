@@ -32,7 +32,6 @@ const SettingsModal = ({
               themes={themeNames}
           />
         </Space>
-
       </Modal>
   );
 };

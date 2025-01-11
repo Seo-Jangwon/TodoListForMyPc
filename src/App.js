@@ -271,7 +271,6 @@ const App = () => {
               onLogout={handleLogout}
               currentTheme={currentTheme}
               onThemeChange={handleThemeChange}
-
           />
         </Layout>
       </ConfigProvider>
