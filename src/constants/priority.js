@@ -1,4 +1,4 @@
-import tokyoNight from './tokyoNight';
+import tokyoNight from './colorThemes/tokyoNight';
 
 export const PRIORITY = {
   HIGH: {

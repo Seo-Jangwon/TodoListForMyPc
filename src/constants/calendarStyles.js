@@ -1,5 +1,3 @@
-import dayjs from "dayjs";
-
 export const getDateStyle = (date, current, theme, type) => {
   if (date.format("YYYY-MM") === current.format("YYYY-MM")) {
     switch (date.format("ddd")) {

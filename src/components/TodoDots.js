@@ -2,7 +2,6 @@ import React from "react";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import defaultTheme from "../constants/defaultTheme";
 
 dayjs.extend(isBetween);
 
@@ -38,8 +37,6 @@ const TodoDots = ({ todos, date }) => {
     MEDIUM: todayTodos.filter((todo) => todo.priority === "MEDIUM"),
     LOW: todayTodos.filter((todo) => todo.priority === "LOW"),
   };
-
-  const theme = defaultTheme.token;
 
   return (
     <Tooltip

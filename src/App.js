@@ -20,6 +20,9 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isBetween from "dayjs/plugin/isBetween";
 import defaultTheme from "./constants/defaultTheme";
+import SettingsModal from "./components/settings";
+import {signInWithGoogle, signOut} from './firebase/auth';
+import {getTheme} from "./constants/defaultTheme";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -35,6 +38,50 @@ const App = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [formVisible, setFormVisible] = useState(false);
   const [editingTodo, setEditingTodo] = useState(null);
+  const [settingVisible, setSettingVisible] = useState(false); // 세팅창 보일지 말지
+
+  //=================================================================
+  // 로그인 상태 관리
+  const [auth, setAuth] = useState({
+    isAuthenticated: false,
+    user: null,
+    accessToken: null,
+    expiresAt: null
+  });
+
+  const handleGoogleLogin = async () => {
+    console.log("Login attempt");  // 로그 추가
+    try {
+      const authData = await signInWithGoogle();
+      console.log("Auth data:", authData);  // 로그 추가
+      setAuth(authData);
+      setSettingVisible(false);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setAuth({
+        isAuthenticated: false,
+        user: null,
+        accessToken: null
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+  //=================================================================
+
+  // 테마 변경
+  const [currentTheme, setCurrentTheme] = useState('tokyoNight');
+
+  // 테마 변경 핸들러
+  const handleThemeChange = (themeName) => {
+    setCurrentTheme(themeName);
+  };
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
@@ -117,15 +164,8 @@ const App = () => {
   const theme = defaultTheme.token;
 
   return (
-      <ConfigProvider
-          theme={{
-            ...defaultTheme,
-          }}>
-        <Layout
-            style={{
-              padding: "10px 5px",
-              minHeight: "100vh",
-            }}>
+      <ConfigProvider theme={getTheme(currentTheme)}>
+        <Layout style={{padding: "10px 5px", minHeight: "100vh"}}>
           <Header
               style={{
                 display: "flex",
@@ -157,6 +197,7 @@ const App = () => {
                 <Button
                     type="text"
                     icon={<MoreOutlined style={{fontSize: '22px'}}/>}
+                    onClick={() => setSettingVisible(true)}
                     style={{
                       WebkitAppRegion: "no-drag",
                       color: theme.colorTextSecondary,
@@ -221,6 +262,16 @@ const App = () => {
                 setFormVisible(false);
                 setEditingTodo(null);
               }}
+          />
+
+          <SettingsModal
+              visible={settingVisible}
+              onClose={() => setSettingVisible(false)}
+              auth={auth}
+              onLogin={handleGoogleLogin}
+              onLogout={handleLogout}
+              currentTheme={currentTheme}
+              onThemeChange={handleThemeChange}
           />
         </Layout>
       </ConfigProvider>
