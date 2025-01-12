@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {Modal, Form, Input, Select, DatePicker, Space, theme} from 'antd';
 import dayjs from 'dayjs';
+import {sanitizeTodoData, validateTodoInput} from "../utils/formSecurity";
 
 const {Option} = Select;
 
@@ -29,42 +30,29 @@ const TodoForm = ({visible, initialValues = null, onSubmit, onCancel}) => {
     try {
       const values = await form.validateFields();
 
-      // 시작 시간 종료 시간 상호 의존성 체크
-      if ((values.startDate && !values.endDate) || (!values.startDate
-          && values.endDate)) {
-        if (!values.endDate) {
-          form.setFields([{
-            name: 'endDate',
-            errors: ['종료 시간을 선택해주세요']
-          }]);
-        } else {
-          form.setFields([{
-            name: 'startDate',
-            errors: ['시작 시간을 선택해주세요']
-          }]);
-        }
-        return; // 에러 시 종료
+      // 입력값 검증
+      const errors = validateTodoInput(values);
+      if (Object.keys(errors).length > 0) {
+        // 에러가 있으면 폼에 표시
+        form.setFields(
+            Object.entries(errors).map(([field, error]) => ({
+              name: field,
+              errors: [error]
+            }))
+        );
+        return;
       }
 
-      // 시작 시간 없이 종료 시간이 선택된 경우에도 경고 표시
-      if (values.endDate && !values.startDate) {
-        form.setFields([{
-          name: 'startDate',
-          errors: ['시작 시간을 선택해주세요']
-        }]);
-        return; // 제출을 막음
-      }
+      // 데이터 정제
+      const sanitizedData = sanitizeTodoData(values);
 
       // 모든 검증 통과 시 제출
-      const submitData = {
-        ...values,
-        startDate: values.startDate ? values.startDate.format() : null,
-        endDate: values.endDate ? values.endDate.format() : null,
-      };
-      onSubmit(submitData);
+      onSubmit(sanitizedData);
       form.resetFields();
     } catch (error) {
-      console.log('Validate Failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Form validation failed:', error);
+      }
     }
   };
 
@@ -120,6 +108,7 @@ const TodoForm = ({visible, initialValues = null, onSubmit, onCancel}) => {
                 validateTrigger={['onChange', 'onBlur']}
             >
               <DatePicker
+                  inputReadOnly={true}
                   showTime={{format: 'HH:mm'}}
                   format="YYYY-MM-DD HH:mm"
                   placeholder="시작 시간 선택"
@@ -156,6 +145,7 @@ const TodoForm = ({visible, initialValues = null, onSubmit, onCancel}) => {
                 validateTrigger={['onChange', 'onBlur']}
             >
               <DatePicker
+                  inputReadOnly={true}
                   showTime={{format: 'HH:mm'}}
                   format="YYYY-MM-DD HH:mm"
                   placeholder="종료 시간 선택"

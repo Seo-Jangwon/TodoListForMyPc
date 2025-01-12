@@ -11,7 +11,7 @@ import nightOwl from "./nightOwl";
 import nord from "./nord";
 import oceanicNext from "./oceanicNext";
 import oneDark from "./oneDark";
-import oneInkwell from "./oneInkwell";
+import matcha from "./matcha";
 import palenight from "./palenight";
 import rosePine from "./rosePine";
 import solarized from "./solarized";
@@ -29,12 +29,12 @@ export const themes = {
   githubDark,
   gruvbox,
   material,
+  matcha,
   monokai,
   nightOwl,
   nord,
   oceanicNext,
   oneDark,
-  oneInkwell,
   palenight,
   rosePine,
   solarized,
@@ -52,13 +52,13 @@ export const themeNames = {
   everforest: "Everforest",
   githubDark: "GithubDark",
   gruvbox: "Gruvbox",
+  matcha: "Matcha",
   material: "Material",
   monokai: "Monokai",
   nightOwl: "NightOwl",
   nord: "Nord",
   oceanicNext: "OceanicNext ",
   oneDark: "OneDark",
-  oneInkwell: "OneInkwell",
   palenight: "Palenight",
   rosePine: "RosePine",
   solarized: "Solarized",

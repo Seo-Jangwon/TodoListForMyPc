@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import {
   Layout,
   Flex,
@@ -6,12 +6,12 @@ import {
   Space,
   ConfigProvider,
   Tooltip,
-  theme
+  theme,
+  message
 } from "antd";
-import {
-  CloseOutlined,
-  MoreOutlined, PlusCircleFilled,
-} from "@ant-design/icons";
+import {CloseOutlined, MoreOutlined, PlusCircleFilled} from "@ant-design/icons";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
+import {signInWithGoogle, signOut} from './firebase/auth';
 import "antd/dist/reset.css";
 import TodoCalendar from "./components/calender/index";
 import TodoList from "./components/TodoList";
@@ -21,7 +21,6 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isBetween from "dayjs/plugin/isBetween";
 import SettingsModal from "./components/settings";
-import {signInWithGoogle, signOut} from './firebase/auth';
 import {getTheme} from "./constants/defaultTheme";
 
 dayjs.extend(isSameOrAfter);
@@ -38,55 +37,175 @@ const App = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [formVisible, setFormVisible] = useState(false);
   const [editingTodo, setEditingTodo] = useState(null);
-  const [settingVisible, setSettingVisible] = useState(false); // 세팅창 보일지 말지
+  const [settingVisible, setSettingVisible] = useState(false);
   const {token} = theme.useToken();
 
-  //=================================================================
-  // 로그인 상태 관리
+  // 인증 상태 관리
   const [auth, setAuth] = useState({
     isAuthenticated: false,
-    user: null,
-    accessToken: null,
-    expiresAt: null
+    user: {
+      displayName: null,
+      email: null,
+    }
   });
 
-  const handleGoogleLogin = async () => {
-    console.log("Login attempt");  // 로그 추가
-    try {
-      const authData = await signInWithGoogle();
-      console.log("Auth data:", authData);  // 로그 추가
-      setAuth(authData);
-      setSettingVisible(false);
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
+  // 토큰 관리
+  const [authToken, setAuthToken] = useState({
+    token: null,
+    expirationTime: null
+  });
 
-  const handleLogout = async () => {
+  //로그아웃
+  const handleLogout = useCallback(async () => {
     try {
       await signOut();
       setAuth({
         isAuthenticated: false,
-        user: null,
-        accessToken: null
+        user: null
       });
+      setAuthToken({
+        token: null,
+        expirationTime: null
+      });
+      message.success('로그아웃되었습니다');
     } catch (error) {
-      console.error("Logout failed:", error);
+      message.error('로그아웃 중 문제가 발생했습니다');
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Logout error:', error);
+      }
+    }
+  }, []);
+
+  // 토큰 갱신
+  const refreshToken = useCallback(async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (user) {
+        const newToken = await user.getIdToken(true);
+        const newExpirationTime = new Date(new Date().getTime() + 3600 * 1000);
+        setAuthToken({
+          token: newToken,
+          expirationTime: newExpirationTime
+        });
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Token refresh failed:', error);
+      }
+      handleLogout();
+    }
+  }, [handleLogout]);
+
+  // 토큰 만료 체크
+  useEffect(() => {
+    const checkTokenExpiration = () => {
+      if (authToken.expirationTime && new Date() >= authToken.expirationTime) {
+        refreshToken();
+      }
+    };
+
+    const interval = setInterval(checkTokenExpiration, 60000);
+    return () => clearInterval(interval);
+  }, [authToken, refreshToken]);
+
+  // Firebase Auth 상태 감시
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const token = await user.getIdToken();
+          const expirationTime = new Date(new Date().getTime() + 3600 * 1000);
+
+          setAuth({
+            isAuthenticated: true,
+            user: {
+              displayName: user.displayName,
+              email: user.email
+            }
+          });
+
+          setAuthToken({
+            token: token,
+            expirationTime: expirationTime
+          });
+        } catch (error) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Token retrieval failed:', error);
+          }
+          handleLogout();
+        }
+      } else {
+        setAuth({
+          isAuthenticated: false,
+          user: null
+        });
+        setAuthToken({
+          token: null,
+          expirationTime: null
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithGoogle();
+
+      if (result?.user) {
+        setAuth({
+          isAuthenticated: true,
+          user: {
+            displayName: result.user.displayName,
+            email: result.user.email
+          }
+        });
+
+        if (result.user.getIdToken) {
+          const token = await result.user.getIdToken();
+          const expirationTime = new Date(new Date().getTime() + 3600 * 1000);
+          setAuthToken({
+            token: token,
+            expirationTime: expirationTime
+          });
+        }
+
+        setSettingVisible(false);
+        message.success('로그인되었습니다');
+      }
+    } catch (error) {
+      message.error('로그인에 실패했습니다. 다시 시도해주세요.');
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Login error:', error);
+      }
     }
   };
-  //=================================================================
 
-  // 테마 변경
   const [currentTheme, setCurrentTheme] = useState('tokyoNight');
 
-  // 테마 변경 핸들러
   const handleThemeChange = (themeName) => {
     setCurrentTheme(themeName);
   };
 
+  // todos 저장
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+    if (auth.isAuthenticated && auth.user?.email) {
+      localStorage.setItem(`todos_${auth.user.email}`, JSON.stringify(todos));
+    }
+  }, [todos, auth.isAuthenticated, auth.user]);
+
+  // todos 초기 로드
+  useEffect(() => {
+    if (auth.isAuthenticated && auth.user?.email) {
+      const savedTodos = localStorage.getItem(`todos_${auth.user.email}`);
+      if (savedTodos) {
+        setTodos(JSON.parse(savedTodos));
+      }
+    }
+  }, [auth.isAuthenticated, auth.user]);
 
   const getFilteredTodos = () => {
     const noDateTodos = todos.filter(
@@ -134,9 +253,13 @@ const App = () => {
       endDate: values.endDate || null,
       completed: false,
       createdAt: new Date().toISOString(),
+      userId: auth.user?.email
     };
 
-    console.log("새로운 할 일:", newTodo);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("New Todo:", newTodo);
+    }
+
     setTodos((prev) => [...prev, newTodo]);
     setFormVisible(false);
   };
